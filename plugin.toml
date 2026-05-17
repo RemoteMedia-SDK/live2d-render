@@ -1,0 +1,31 @@
+# Live2DRenderNode as a standalone Path 3 cdylib plugin.
+#
+# Headless wgpu+CubismCore renderer for Live2D Cubism models. Consumes
+# blendshape / emotion / audio_clock / barge_in envelopes from upstream
+# lip-sync nodes (e.g. Audio2FaceLipSyncNode) plus an audio clock tap,
+# samples a state-machine ring, and emits RuntimeData::Video frames
+# (Rgb24) at a fixed framerate via the pacer's ClockedToOutboundMedia
+# entry point.
+#
+# Consumer manifest reference:
+#
+#   "plugins": ["live2d-render@v0.1.0"]
+#       (canonical-org shorthand → github.com/RemoteMedia-SDK/live2d-render)
+#
+#   "plugins": ["./plugins/liblive2d_render_plugin.so"]
+#       (local path)
+#
+# IMPORTANT: building this plugin from source requires the proprietary
+# Live2D Cubism SDK for Native. Set LIVE2D_CUBISM_CORE_DIR to the
+# unpacked CubismSdkForNative-5-r.X directory before `cargo build`.
+# See cubism-core-sys/CUBISM_SDK.md for acquisition + license.
+
+[plugin]
+name        = "live2d-render"
+version     = "0.1.0"
+language    = "rust"
+description = "Live2D Cubism renderer (wgpu + cubism-core) — standalone Rust cdylib plugin"
+
+[rust]
+node_types    = ["Live2DRenderNode"]
+asset_pattern = "lib{name}-{arch}-{os}.{ext}"

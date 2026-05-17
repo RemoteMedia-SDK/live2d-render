@@ -1,0 +1,23 @@
+[package]
+name = "cubism-core"
+version = "0.1.0"
+edition = "2021"
+license = "MIT OR Apache-2.0"
+description = """
+Safe Rust wrapper around the Live2D Cubism Core C runtime. Loads
+.moc3 files, evaluates parameter-driven deformer chains, and exposes
+post-deformer drawable mesh data (vertex positions, UVs, indices,
+opacity, render order, blend modes, masks). Vendored into the
+live2d-render Path-3 plugin so the host crate doesn't drag in the
+Cubism SDK build-time dep just for this single renderer.
+"""
+
+[lib]
+name = "cubism_core"
+
+[dependencies]
+cubism-core-sys = { path = "../cubism-core-sys" }
+bitflags = "2.4"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror = "1.0"
