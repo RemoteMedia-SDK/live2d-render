@@ -123,14 +123,29 @@ fn pick_lib(sdk: &PathBuf) -> (PathBuf, String) {
     }
 
     if cfg!(target_os = "linux") {
-        if !cfg!(target_arch = "x86_64") {
+        // x86_64 lives under Core/lib/linux/x86_64. ARM64 (e.g. the
+        // GitHub-hosted `ubuntu-24.04-arm` matrix runner) and
+        // ARMv7 / RPi ship under Core/lib/experimental/. All three are
+        // .a static archives with the same link surface, so the
+        // `static=Live2DCubismCore` directive at the call site is
+        // unchanged — only the search dir differs.
+        let sub = if cfg!(target_arch = "x86_64") {
+            "linux/x86_64"
+        } else if cfg!(target_arch = "aarch64") {
+            "experimental/linux/arm64"
+        } else if cfg!(target_arch = "arm") {
+            // armv7 / armhf — Raspberry Pi 32-bit userspace
+            "experimental/rpi"
+        } else {
             panic!(
-                "Cubism SDK for Native ships an x86_64 lib for Linux. \
-                 ARM64 / RPi builds live under Core/dll/experimental/ \
-                 and aren't wired up here yet."
+                "Cubism SDK for Native ships static libs for Linux \
+                 x86_64 (Core/lib/linux/x86_64), AArch64 \
+                 (Core/lib/experimental/linux/arm64), and ARMv7 / RPi \
+                 (Core/lib/experimental/rpi). Target arch isn't one of \
+                 those."
             );
-        }
-        return (core_lib.join("linux/x86_64"), "Live2DCubismCore".into());
+        };
+        return (core_lib.join(sub), "Live2DCubismCore".into());
     }
 
     if cfg!(target_os = "windows") {
