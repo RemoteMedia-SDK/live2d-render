@@ -13,8 +13,16 @@ jobs:
   release:
     uses: RemoteMedia-SDK/remotemedia-sdk/.github/workflows/build-plugin.yml@main
     with:
-      crate-name:   live2d-render-plugin
-      display-name: live2d-render
-      tag:          ${{ inputs.tag || github.ref_name }}
+      crate-name:         live2d-render-plugin
+      display-name:       live2d-render
+      tag:                ${{ inputs.tag || github.ref_name }}
+      # Cubism Native SDK is license-restricted (Live2D Free Material
+      # License) and ships from a private RemoteMedia-SDK repo. The
+      # reusable workflow fetches it + exports LIVE2D_CUBISM_CORE_DIR
+      # so cubism-core-sys's build.rs can locate the library. See
+      # LIVE2D_SDK_SETUP.md for the one-time PAT + secret setup.
+      cubism-sdk-version: v5.r.5
+    secrets:
+      CUBISM_SDK_TOKEN: ${{ secrets.CUBISM_SDK_TOKEN }}
     permissions:
       contents: write
