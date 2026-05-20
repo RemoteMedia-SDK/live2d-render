@@ -22,7 +22,16 @@ incremental = true
 
 [lib]
 name = "live2d_render_plugin"
-crate-type = ["cdylib"]
+# cdylib: matrix-built `.so` for dlopen. rlib: in-process linking
+# for consumers like examples/qwen-s2s-avatar-plugins.
+crate-type = ["cdylib", "rlib"]
+
+# `plugin-export` (default on) gates the `abi_stable` root-module
+# symbol for dlopen. Disable when linking multiple plugins as rlibs
+# in one binary (symbol collision).
+[features]
+default = ["plugin-export"]
+plugin-export = []
 
 # Path-3 hand-rolled plugin: depends ONLY on the skinny
 # `remotemedia-plugin-sdk` umbrella plus the heavy wgpu / Cubism stack

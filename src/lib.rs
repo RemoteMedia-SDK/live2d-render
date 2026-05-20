@@ -130,15 +130,18 @@ impl FfiNodeFactory for Live2DRenderNodeFactory {
     }
 
     fn create(&self, params: RString) -> RResult<FfiNodeBox, RString> {
-        let parsed: Live2DRenderManifestParams =
-            match serde_json::from_str(params.as_str()) {
-                Ok(p) => p,
-                Err(e) => {
-                    return RErr(RString::from(format!(
-                        "Live2DRenderNode params parse failed: {e}"
-                    )));
-                }
-            };
+        // Accepts both snake_case and camelCase manifest keys via
+        // plugin-sdk's lenient deserializer.
+        let parsed: Live2DRenderManifestParams = match remotemedia_plugin_sdk::params::deserialize_params(
+            params.as_str(),
+        ) {
+            Ok(p) => p,
+            Err(e) => {
+                return RErr(RString::from(format!(
+                    "Live2DRenderNode params parse failed: {e}"
+                )));
+            }
+        };
         let node = match build_node(&parsed) {
             Ok(n) => n,
             Err(e) => return RErr(RString::from(format!("Live2DRenderNode load failed: {e}"))),
@@ -150,4 +153,8 @@ impl FfiNodeFactory for Live2DRenderNodeFactory {
     }
 }
 
+// Emits the abi_stable root-module symbol for dlopen. Gated behind
+// the `plugin-export` cargo feature so the rlib can be linked
+// alongside other plugins without duplicate-symbol collisions.
+#[cfg(feature = "plugin-export")]
 remotemedia_plugin_sdk::plugin_export!(Live2DRenderNodeFactory);
