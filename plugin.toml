@@ -22,7 +22,7 @@
 
 [plugin]
 name        = "live2d-render"
-version     = "0.1.0"
+version     = "0.5.0"
 language    = "rust"
 description = "Live2D Cubism renderer (wgpu + cubism-core) — standalone Rust cdylib plugin"
 
